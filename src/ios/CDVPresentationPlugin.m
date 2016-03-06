@@ -345,10 +345,8 @@
 
     PresentationSession * ps = [self.sessions objectForKey:sessionId];
     if(ps) {
-        if(![ps.state isEqual:@"cancelled"]){
-            [ps setState:@"cancelled"];
-            [self stateChanged:sessionId];
-        }
+        [ps setState:@"cancelled"];
+        [self stateChanged:sessionId];
     }
 }
 
@@ -376,7 +374,6 @@
             [ps.onmessage callWithArguments:@[msg]];
         }
     }
-
 }
 
 - (void)presentationSessionClose:(CDVInvokedUrlCommand *)command
