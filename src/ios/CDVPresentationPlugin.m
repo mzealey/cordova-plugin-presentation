@@ -346,7 +346,6 @@
     PresentationSession * ps = [self.sessions objectForKey:sessionId];
     if(ps) {
         [ps setState:@"cancelled"];
-        [self stateChanged:sessionId];
     }
 }
 
@@ -428,7 +427,6 @@
     if(ps) {
         if(![ps.state isEqual:@"disconnected"]){
             [ps setState:@"disconnected"];
-            [self stateChanged:sid];
         }
 
         UIWindow *secondWindow;
