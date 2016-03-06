@@ -309,6 +309,7 @@ public class CDVPresentationPlugin extends CordovaPlugin implements DisplayManag
 				}).setOnCancelListener(new DialogInterface.OnCancelListener() {
 					@Override
 					public void onCancel(DialogInterface dialog) {
+						session.setState(PresentationSession.CANCELLED);
 						session.setState(PresentationSession.DISCONNECTED);
 					}
 				});

@@ -342,6 +342,14 @@
     NSLog(@"Called dismissPickerRequested");
     [self.viewController dismissViewControllerAnimated:YES completion:nil];
     self.pickerShowing = NO;
+
+    PresentationSession * ps = [self.sessions objectForKey:sessionId];
+    if(ps) {
+        if(![ps.state isEqual:@"cancelled"]){
+            [ps setState:@"cancelled"];
+            [self stateChanged:sessionId];
+        }
+    }
 }
 
 - (void)loadedPicker

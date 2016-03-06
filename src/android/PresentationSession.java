@@ -30,6 +30,7 @@ import android.app.Activity;
  *
  */
 public class PresentationSession {
+    public static String CANCELLED = "cancelled";
 	public static String DISCONNECTED = "disconnected";
 	public static String CONNECTED = "connected";
 	private String id;
