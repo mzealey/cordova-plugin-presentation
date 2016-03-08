@@ -308,13 +308,19 @@
     NSLog(@"Called webscreenReady");
     WebscreenViewController * wvc = [self.webscreens objectForKey:sid];
     PresentationSession * ps = [self.sessions objectForKey:sid];
-    if (wvc && ps){
+
+    if (wvc && ps)
+    {
         // Webscreen is ready to load the url to be presented
         [wvc loadUrl:ps.url];
-    } else {
+    }
+    else
+    {
         // Default display handling
-        for (WebscreenViewController * defaultwvc in self.screens) {
-            if ([defaultwvc.screenId isEqual:sid] ){
+        for (WebscreenViewController * defaultwvc in self.screens)
+        {
+            if ([defaultwvc.screenId isEqual:sid])
+            {
                 [defaultwvc loadUrl:[NSString stringWithFormat:@"%@#%@",self.defaultDisplayUrl,[defaultwvc.screenId substringFromIndex:31]]];
                 break;
             }
