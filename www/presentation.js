@@ -81,6 +81,17 @@ function NavigatorPresentation()
     exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "setDefaultDisplay", [ defaultDisplay ]);
 }
 
+Object.defineProperty(NavigatorPresentation.prototype, "showSecondScreen",
+{
+    get: function ()
+    {
+        return function(doShow)
+        {
+            exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "setSecondScreen", [ doShow ? "activate" : "deactivate" ]);
+        };
+    }
+});
+
 Object.defineProperty(NavigatorPresentation.prototype,"requestSession",
 {
     get: function ()
