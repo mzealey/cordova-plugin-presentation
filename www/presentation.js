@@ -24,10 +24,9 @@ var makeAbs = function(url)
 {
 	var absUrl = null;
 
-	try { absUrl = new URL(url, location.href).href; } catch(e) { }
+	try {absUrl = new URL(url,location.href).href; } catch(e) {}
 
-	if(!absUrl)
-    {
+	if(!absUrl) {
 		var a = document.createElement('a');
 		a.href = url;
 		absUrl = a.href;
@@ -50,11 +49,6 @@ var exec = function()
     0);
 }
 
-//hold the reference to the user defined callback
-var onavailablechange = undefined;
-
-var defaultDisplay;
-
 /** WebIDL: NavigatorPresentation
 
   interface NavigatorPresentation : EventTarget {
@@ -68,85 +62,72 @@ var defaultDisplay;
   TODO(mla): EventTarget implementation.
 
  */
-function NavigatorPresentation()
-{
-    // In case of mirroring, display the placeholder page:
-    defaultDisplay = makeAbs("presentation/display.html");
-    var c = document.getElementsByTagName("script");
+function NavigatorPresentation() { }
 
-    for(var i = 0; i < c.length; i++)
-    {
-        if(c[i] && c[i].src && c[i].src.indexOf("/cordova.js") != -1)
-        {
-            defaultDisplay = c[i].src.replace("/cordova.js", "/presentation/display.html");
-        }
-    }
-
-    exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "setDefaultDisplay", [ defaultDisplay ]);
-}
-
-Object.defineProperty(NavigatorPresentation.prototype, "showSecondScreen",
-{
-    set: function (doShow)
-    {
-        
-    }
-}
-
-Object.defineProperty(NavigatorPresentation.prototype, "requestSession",
+Object.defineProperty(NavigatorPresentation.prototype, "setup",
 {
     get: function ()
     {
-        return navigatorPresentationRequestSession;
-    }
-});
-
-Object.defineProperty(NavigatorPresentation.prototype, "onavailablechange",
-{
-    get: function ()
-    {
-        return onavailablechange;
-    },
-    set: function(eventCallback)
-    {
-        if (typeof eventCallback == "function" || eventCallback == null || eventCallback == undefined)
+        return function()
         {
-            onavailablechange = eventCallback;
+            // In case of mirroring, display the placeholder page:
+            var defaultDisplay = makeAbs("presentation/display.html");
+            var c = document.getElementsByTagName("script");
 
-            if (onavailablechange)
+            for(var i = 0; i < c.length; i++)
             {
-                //trigger the service to serve screen states
-                var scb = function(res)
+                if(c[i] && c[i].src && c[i].src.indexOf("/cordova.js") != -1)
                 {
-                    if (typeof onavailablechange == "function")
-                    {
-                        var evt = new AvailableChangeEvent("availablechange",res);
-                        onavailablechange(evt);
-                    }
+                    defaultDisplay = c[i].src.replace("/cordova.js", "/presentation/display.html");
                 }
+            }
 
-                exec(scb, function(){}, "Presentation", "addWatchAvailableChange", []);
-            }
-            else
-            {
-                //stop the service serving screen states
-                exec(function(){}, function(){}, "Presentation", "clearWatchAvailableChange", []);
-            }
+            exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "setDefaultDisplay", [ defaultDisplay ]);            
         };
     }
 });
 
+Object.defineProperty(NavigatorPresentation.prototype, "requestSession",{
+    get: function () {
+        return navigatorPresentationRequestSession;
+    }
+});
+
+Object.defineProperty(NavigatorPresentation.prototype, "onavailablechange", {
+  get: function () {
+    return onavailablechange;
+  },
+  set: function(eventCallback) {
+    if (typeof eventCallback == "function" || eventCallback == null || eventCallback == undefined) {
+      onavailablechange = eventCallback;
+      if (onavailablechange) {
+        //trigger the service to serve screen states
+        var scb = function(res){
+            if (typeof onavailablechange == "function") {
+                var evt = new AvailableChangeEvent("availablechange",res);
+                onavailablechange(evt);
+            }
+        }
+        exec(scb, function(){}, "Presentation", "addWatchAvailableChange", []);
+      }
+      else {
+        //stop the service serving screen states
+        exec(function(){}, function(){}, "Presentation", "clearWatchAvailableChange", []);
+      }
+    };
+  }
+});
+
+//hold the reference to the user defined callback
+var onavailablechange = undefined;
+
 // TODO(mla): check if on sender side this event can ever be expected
-Object.defineProperty(NavigatorPresentation.prototype, "onpresent",
-{
+Object.defineProperty(NavigatorPresentation.prototype, "onpresent", {
     get: function () { }
 });
 
 var navigatorPresentationRequestSession = function(url)
 {
-    if(!defaultDisplay)
-        return;
-
     var delSession = {
         _id:"",
         state: DISCONNECTED,
@@ -159,30 +140,27 @@ var navigatorPresentationRequestSession = function(url)
 
     var successCallback = function(result)
     {
-        // result == { id: String, eventType: String, value: String }
-        delSession._id = result.id;
+      // result == { id: String, eventType: String, value: String }
+      delSession._id = result.id;
 
-        switch(result.eventType)
-        {
-            case "onstatechange":
-                delSession.state=result.value;
+      switch(result.eventType)
+      {
+        case "onstatechange":
+          delSession.state=result.value;
+               if (typeof delSession.onstatechange == "function") {
+               delSession.onstatechange(result.value);
+               }
+          break;
 
-                if (typeof delSession.onstatechange == "function")
-                {
-                    delSession.onstatechange(result.value);
-                }
-                break;
+        case "onmessage":
+               if (typeof delSession.onmessage == "function") {
+               delSession.onmessage(result.value);
+               }
+          break;
 
-            case "onmessage":
-                if (typeof delSession.onmessage == "function")
-                {
-                    delSession.onmessage(result.value);
-                }
-                break;
-
-            default:
-                break;
-        }
+        default:
+          break;
+      }
     };
 
     var errorCallback = function( ) { };
@@ -206,18 +184,14 @@ var navigatorPresentationRequestSession = function(url)
   http://www.w3.org/2014/secondscreen/presentation-api/20140721/#AvailableChangeEvent_interface
 
  */
-var AvailableChangeEvent = function(type, eventInitDict)
-{
+var AvailableChangeEvent = function(type, eventInitDict){
     this.type = type;
-
     var available = eventInitDict && eventInitDict.available == true;
 
-    Object.defineProperty(this, "available",
-    {
-        get: function ()
-        {
-            return available;
-        }
+    Object.defineProperty(this, "available", {
+      get: function () {
+        return available;
+      }
     });
 };
 
@@ -244,101 +218,76 @@ var RESUMED = "resumed";
 var CANCELLED = "cancelled";
 var PresentationSessionState = [CONNECTED, DISCONNECTED, RESUMED, CANCELLED];
 
-var PresentationSession = function(delSession)
-{
-    var onmessage = null;
-    var onstatechange = null;
-    var self = this;
+var PresentationSession = function(delSession) {
+  var onmessage = null;
+  var onstatechange = null;
+  var self = this;
 
-    delSession.onstatechange = function()
-    {
-        if (typeof onstatechange == "function")
-        {
-            onstatechange.call(null);
-        };
+  delSession.onstatechange = function(){
+    if (typeof onstatechange == "function") {
+      onstatechange.call(null);
     };
+  };
 
-    delSession.onmessage = function(msg)
-    {
-        if (typeof onmessage == "function")
-        {
-            onmessage.call(null,msg);
-        };
+  delSession.onmessage = function(msg){
+    if (typeof onmessage == "function") {
+      onmessage.call(null,msg);
     };
+  };
 
-    Object.defineProperty(this, "state",
-    {
-        get: function ()
-        {
-            return (delSession && delSession.state) || null;
-        }
-    });
+  Object.defineProperty(this, "state", {
+    get: function () {
+      return (delSession && delSession.state) || null;
+    }
+  });
 
-    Object.defineProperty(this, "onmessage",
-    {
-        get: function ()
-        {
-            return onmessage;
-        },
-        set: function(value)
-        {
-            if (typeof value == "function" || value == null)
-            {
-                onmessage = value;
-            };
-        }
-    });
+  Object.defineProperty(this, "onmessage", {
+    get: function () {
+      return onmessage;
+    },
+    set: function(value){
+      if (typeof value == "function" || value == null) {
+        onmessage = value;
+      };
+    }
+  });
 
-    Object.defineProperty(this, "onstatechange",
-    {
-        get: function ()
-        {
-            return onstatechange;
-        },
-        set: function(value)
-        {
-            if (typeof value == "function" || value == null)
-            {
-                onstatechange = value;
-            };
-        }
-    });
+  Object.defineProperty(this, "onstatechange", {
+    get: function () {
+      return onstatechange;
+    },
+    set: function(value){
+      if (typeof value == "function" || value == null) {
+        onstatechange = value;
+      };
+    }
+  });
 
-    Object.defineProperty(this, "postMessage",
-    {
-        get: function ()
-        {
-            return function(msg)
-            {
-                return delSession.postMessage(msg);
-            };
-        }
-    });
+  Object.defineProperty(this, "postMessage", {
+    get: function () {
+      return function(msg){
+        return delSession.postMessage(msg);
+      };
+    }
+  });
 
-    Object.defineProperty(this, "close",
-    {
-        get: function ()
-        {
-            return function()
-            {
-                return delSession.close();
-            };
-        }
-    });
+  Object.defineProperty(this, "close", {
+    get: function () {
+      return function(){
+        return delSession.close();
+      };
+    }
+  });
 };
 
-var presentationSessionPostMessage = function(ds)
-{
-    return function(message)
-    {
+var presentationSessionPostMessage = function(ds) {
+    return function(message) {
         exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "presentationSessionPostMessage", [ ds._id, message ]);
     };
 };
 
-var presentationSessionClose = function(ds)
-{
-    return function()
-    {
+var presentationSessionClose = function(ds) {
+    return function() {
         exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "presentationSessionClose", [ ds._id ]);
     };
 };

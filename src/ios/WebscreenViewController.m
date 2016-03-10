@@ -51,14 +51,13 @@
 {
     NSLog(@"Webscreen viewDidAppear %@", NSStringFromCGSize(self.view.bounds.size));
 
-    if(self.webView)
-    {
+    if(self.webView){
         return;
     }
 
     self.webView = [[UIWebView alloc] initWithFrame:self.view.bounds];
-    self.webView.delegate = self;
-    self.webView.hidden = YES;
+    self.webView.delegate=self;
+    self.webView.hidden=NO;
     self.webView.autoresizesSubviews = YES;
     self.webView.backgroundColor = [UIColor clearColor];
     [self.webView setScalesPageToFit:YES];
@@ -125,6 +124,7 @@
         NSLog(@"window close request!");
         [self.delegate webscreenDidClose: self.sid];
     };
+
 }
 
 - (void)closeRequested:(NSString *)sid

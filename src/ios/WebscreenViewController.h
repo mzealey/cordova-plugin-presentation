@@ -24,6 +24,7 @@
 
 @protocol WebscreenDelegate ;
 
+
 @interface WebscreenViewController : UIViewController  <UIWebViewDelegate>
 
 @property (nonatomic, strong) IBOutlet UIWindow *window;
@@ -37,6 +38,7 @@
 - (void)close;
 
 @end
+
 
 @protocol WebscreenDelegate <NSObject>
 
