@@ -34,6 +34,7 @@
 - (void)clearWatchAvailableChange:(CDVInvokedUrlCommand*)command;
 - (void)presentationSessionPostMessage:(CDVInvokedUrlCommand*)command;
 - (void)presentationSessionClose:(CDVInvokedUrlCommand*)command;
+- (void)setSecondScreen:(CDVInvokedUrlCommand*)command;
 
 @end
 

@@ -81,7 +81,6 @@
 
     // Add the requested URL to the session
     self.defaultDisplayUrl = [command.arguments objectAtIndex:0];
-
 }
 
 - (void)requestSession:(CDVInvokedUrlCommand*)command
@@ -156,7 +155,6 @@
         // Overwrite the old page wide handler
         self.watchCallbackId = command.callbackId;
     }
-
 }
 
 - (void)clearWatchAvailableChange:(CDVInvokedUrlCommand*)command
@@ -234,7 +232,6 @@
         [self returnInfo:self.watchCallbackId andReturn:returnInfo andKeepCallback:true];
     }
 }
-
 
 - (void)handleScreenDidConnectNotification:(NSNotification*)aNotification
 {
@@ -354,10 +351,9 @@
     NSLog(@"Called loadedPicker");
 
     // Fill the picker initially with available screens
-
-        for (WebscreenViewController * wvc in self.screens) {
-            [self.devicePickerViewController addScreen:wvc];
-        }
+    for (WebscreenViewController * wvc in self.screens) {
+        [self.devicePickerViewController addScreen:wvc];
+    }
 }
 
 - (void)presentationSessionPostMessage:(CDVInvokedUrlCommand *)command
@@ -380,6 +376,30 @@
     NSLog(@"Called presentationSessionClose");
     NSString* sid = [command.arguments objectAtIndex:0];
     [self closeSession:sid];
+}
+
+- (void)setSecondScreen:(CDVInvokedUrlCommand*)command
+{    
+    NSString* cmd = [command.arguments objectAtIndex:0];    
+
+    if ([cmd isEqualToString:@"activate"])
+    {
+        for (WebscreenViewController *wvc in self.screens)
+        {
+            [wvc.window setHidden:YES];
+        }
+    }
+    else if([cmd isEqualToString:@"deactivate"])
+    {      
+        for (WebscreenViewController *wvc in self.screens)
+        {
+            [wvc.window setHidden:NO];
+        }
+    }
+    else
+    {
+        NSLog(@"Errore command value");
+    }
 }
 
 - (void)closeRequested:(NSString *)sid
