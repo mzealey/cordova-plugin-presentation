@@ -20,13 +20,10 @@
 var execRaw = require('cordova/exec'),
     cordova = require('cordova');
 
-var makeAbs = function(url)
-{
+var makeAbs = function(url){
 	var absUrl = null;
-
-	try {absUrl = new URL(url,location.href).href; } catch(e) {}
-
-	if(!absUrl) {
+	try{absUrl = new URL(url,location.href).href; }catch(e){}
+	if(!absUrl){
 		var a = document.createElement('a');
 		a.href = url;
 		absUrl = a.href;
@@ -34,19 +31,14 @@ var makeAbs = function(url)
 	if (!absUrl) {
 		absUrl = url;
 	};
-
 	return absUrl;
 }
 
-var exec = function()
-{
-    var args = arguments;
-
-    setTimeout(function()
-    {
-        execRaw.apply(undefined, args);
-    },
-    0);
+var exec = function(){
+  var args = arguments;
+  setTimeout(function() {
+    execRaw.apply(undefined, args);
+  }, 0);
 }
 
 /** WebIDL: NavigatorPresentation
@@ -62,35 +54,21 @@ var exec = function()
   TODO(mla): EventTarget implementation.
 
  */
-function NavigatorPresentation() { }
-
-Object.defineProperty(NavigatorPresentation.prototype, "setup",
-{
-    get: function ()
-    {
-        return function()
-        {
-            // In case of mirroring, display the placeholder page:
-            var defaultDisplay = makeAbs("presentation/display.html");
-            var c = document.getElementsByTagName("script");
-
-            for(var i = 0; i < c.length; i++)
-            {
-                if(c[i] && c[i].src && c[i].src.indexOf("/cordova.js") != -1)
-                {
-                    defaultDisplay = c[i].src.replace("/cordova.js", "/presentation/display.html");
-                }
-            }
-
-            exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "setDefaultDisplay", [ defaultDisplay ]);            
-        };
+function NavigatorPresentation() {
+    // In case of mirroring, display the following placeholder page
+    var defaultDisplay = makeAbs("presentation/display.html");
+    var c=document.getElementsByTagName("script");
+      for(var i=0; i<c.length; i++){
+      if (c[i] && c[i].src && c[i].src.indexOf("/cordova.js") != -1){
+        defaultDisplay= c[i].src.replace("/cordova.js","/presentation/display.html");
+      }
     }
-});
+    exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "setDefaultDisplay", [ defaultDisplay ]);}
 
-Object.defineProperty(NavigatorPresentation.prototype, "requestSession",{
-    get: function () {
-        return navigatorPresentationRequestSession;
-    }
+Object.defineProperty(NavigatorPresentation.prototype,"requestSession",{
+get: function () {
+  return navigatorPresentationRequestSession;
+}
 });
 
 Object.defineProperty(NavigatorPresentation.prototype, "onavailablechange", {
@@ -117,58 +95,52 @@ Object.defineProperty(NavigatorPresentation.prototype, "onavailablechange", {
     };
   }
 });
-
 //hold the reference to the user defined callback
 var onavailablechange = undefined;
 
-// TODO(mla): check if on sender side this event can ever be expected
+  // TODO(mla): check if on sender side this event can ever be expected
 Object.defineProperty(NavigatorPresentation.prototype, "onpresent", {
-    get: function () { }
+get: function () {
+
+}
 });
 
-var navigatorPresentationRequestSession = function(url)
-{
+var navigatorPresentationRequestSession = function(url) {
     var delSession = {
         _id:"",
         state: DISCONNECTED,
         onstatechange: function(){},
         onmessage: function(){}
     };
-
     delSession.postMessage = presentationSessionPostMessage(delSession);
     delSession.close = presentationSessionClose(delSession);
 
-    var successCallback = function(result)
-    {
+    var successCallback = function(result){
       // result == { id: String, eventType: String, value: String }
       delSession._id = result.id;
-
-      switch(result.eventType)
-      {
+      switch(result.eventType) {
         case "onstatechange":
           delSession.state=result.value;
                if (typeof delSession.onstatechange == "function") {
                delSession.onstatechange(result.value);
                }
           break;
-
         case "onmessage":
                if (typeof delSession.onmessage == "function") {
-               delSession.onmessage(result.value);
+          delSession.onmessage(result.value);
                }
           break;
-
         default:
           break;
       }
     };
+    var errorCallback = function(){
 
-    var errorCallback = function( ) { };
-
+    };
     exec(successCallback, errorCallback, "Presentation", "requestSession", [ makeAbs(url) ]);
-
     return new PresentationSession(delSession);
 };
+
 
 /** WebIDL: AvailableChangeEvent
 
@@ -187,7 +159,6 @@ var navigatorPresentationRequestSession = function(url)
 var AvailableChangeEvent = function(type, eventInitDict){
     this.type = type;
     var available = eventInitDict && eventInitDict.available == true;
-
     Object.defineProperty(this, "available", {
       get: function () {
         return available;
@@ -215,32 +186,26 @@ AvailableChangeEvent.prototype = Event.prototype;
 var CONNECTED = "connected";
 var DISCONNECTED = "disconnected";
 var RESUMED = "resumed";
-var CANCELLED = "cancelled";
-var PresentationSessionState = [CONNECTED, DISCONNECTED, RESUMED, CANCELLED];
-
-var PresentationSession = function(delSession) {
+var PresentationSessionState = [CONNECTED,DISCONNECTED,RESUMED];
+var PresentationSession = function(delSession){
   var onmessage = null;
   var onstatechange = null;
   var self = this;
-
   delSession.onstatechange = function(){
     if (typeof onstatechange == "function") {
       onstatechange.call(null);
     };
   };
-
   delSession.onmessage = function(msg){
     if (typeof onmessage == "function") {
       onmessage.call(null,msg);
     };
   };
-
   Object.defineProperty(this, "state", {
     get: function () {
       return (delSession && delSession.state) || null;
     }
   });
-
   Object.defineProperty(this, "onmessage", {
     get: function () {
       return onmessage;
@@ -251,7 +216,6 @@ var PresentationSession = function(delSession) {
       };
     }
   });
-
   Object.defineProperty(this, "onstatechange", {
     get: function () {
       return onstatechange;
@@ -280,16 +244,16 @@ var PresentationSession = function(delSession) {
   });
 };
 
-var presentationSessionPostMessage = function(ds) {
-    return function(message) {
-        exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "presentationSessionPostMessage", [ ds._id, message ]);
-    };
+var presentationSessionPostMessage = function(ds){
+  return function(message){
+               exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "presentationSessionPostMessage", [ ds._id, message ]);
+  };
 };
 
-var presentationSessionClose = function(ds) {
-    return function() {
-        exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "presentationSessionClose", [ ds._id ]);
-    };
+var presentationSessionClose = function(ds){
+  return function(){
+               exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "presentationSessionClose", [ ds._id ]);
+  };
 };
 
 /** WebIDL: PresentEvent
@@ -308,3 +272,4 @@ var presentationSessionClose = function(ds) {
  */
 
 module.exports = new NavigatorPresentation();
+
