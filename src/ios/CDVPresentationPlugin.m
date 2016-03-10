@@ -382,14 +382,14 @@
 {    
     NSString* cmd = [command.arguments objectAtIndex:0];    
 
-    if ([cmd isEqualToString:@"activate"])
+    if ([cmd isEqualToString:@"deactivate"])
     {
         for (WebscreenViewController *wvc in self.screens)
         {
             [wvc.window setHidden:YES];
         }
     }
-    else if([cmd isEqualToString:@"deactivate"])
+    else if([cmd isEqualToString:@"activate"])
     {      
         for (WebscreenViewController *wvc in self.screens)
         {
