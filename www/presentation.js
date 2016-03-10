@@ -87,6 +87,7 @@ Object.defineProperty(NavigatorPresentation.prototype, "showSecondScreen",
     {
         return function(doShow)
         {
+            alert(doShow);
             exec(/*successCallback*/Function, /*errorCallback*/Function, "Presentation", "setSecondScreen", [ doShow ? "activate" : "deactivate" ]);
         };
     }
