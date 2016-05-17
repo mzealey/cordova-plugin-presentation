@@ -199,9 +199,19 @@
                       name:UIScreenDidDisconnectNotification object:nil];
 
     for (WebscreenViewController * wvc in self.screens) {
+        [self.devicePickerViewController removeScreen:wvc];
+
+        UIWindow * secondWindow = wvc.window;
+        [secondWindow.rootViewController dismissViewControllerAnimated:YES completion:nil];
+
+        [self closeSession:wvc.sid];
+        [self.webscreens removeObjectForKey:wvc.sid];
+
         [wvc close];
-        [self.screens removeObject:wvc];
+        [wvc release];
     }
+
+    [self.screens removeAllObjects];
 
     self.screensAvailable = 0;
 }
