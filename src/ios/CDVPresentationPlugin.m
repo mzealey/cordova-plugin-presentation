@@ -208,7 +208,6 @@
         [self.webscreens removeObjectForKey:wvc.sid];
 
         [wvc close];
-        [wvc release];
     }
 
     [self.screens removeAllObjects];
