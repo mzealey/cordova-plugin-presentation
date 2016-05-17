@@ -197,6 +197,13 @@
                       name:UIScreenDidConnectNotification object:nil];
     [center removeObserver:self
                       name:UIScreenDidDisconnectNotification object:nil];
+
+    for (WebscreenViewController * wvc in self.screens) {
+        [wvc close];
+        [self.screens removeObject:wvc];
+    }
+
+    self.screensAvailable = 0;
 }
 
 - (void) addConnectedScreen:(UIScreen *)newScreen
