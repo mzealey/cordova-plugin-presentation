@@ -113,28 +113,26 @@
                                       otherButtonTitles:nil, nil];
         [self.alert show];
     } else {
-        // Show a picker view to the user for screen selection
-        //if(self.navi == nil) {
-        //    if (!self.devicePickerViewController) {
-        //        self.devicePickerViewController = [[DevicePickerViewController alloc] init];
-        //        self.devicePickerViewController.pickerDelegate = self;
-        //        self.navi = [[UINavigationController alloc] initWithRootViewController:self.devicePickerViewController];
-        //    }
-        //}
-
-        // The last caller of requestSession will get the picker result
-        // TODO(mla): API spec needs clarification on this
-        //self.devicePickerViewController.sid = newSession.sid;
-
-        //if (!self.pickerShowing) {
-        //    self.pickerShowing = YES;
-        //    [self.viewController.navigationController presentViewController:self.devicePickerViewController animated:YES completion:nil];
-
-        //    [self.viewController presentViewController:self.navi animated:YES completion:nil];
-        //}
         WebscreenViewController *wvc = [self.screens objectAtIndex:0];
 
-        [self didSelectScreen:wvc forSession:newSession.sid];
+        // Store refs to screen and webscreen
+        PresentationSession * ps = [self.sessions objectForKey:newSession.sid];
+
+        if (ps){
+            UIWindow *secondWindow = wvc.window;
+
+            if (secondWindow) {
+                // Attach session id to the selected screen
+                defaultwvc.sid = newSession.sid;
+
+                WebscreenViewController * newwvc = [[WebscreenViewController alloc] initWithSid:newSession.sid];
+                newwvc.delegate = self;
+                newwvc.session = ps;
+                [self.webscreens setObject:newwvc forKey:newSession.sid];
+
+                secondWindow.rootViewController = newwvc;
+            }
+        }
     }
 }
 
@@ -311,14 +309,12 @@
 
             secondWindow.rootViewController = newwvc;
 
-//            // Hide the default display
-//            [secondWindow.rootViewController dismissViewControllerAnimated:YES completion:^{
+            // Hide the default display
+//          [secondWindow.rootViewController dismissViewControllerAnimated:YES completion:^{
 //
-//                //Now, finally, set up Webscreen and start the fun...
-//
-//                [secondWindow.rootViewController presentViewController:newwvc animated:YES completion:nil];
-//
-//            }];
+                // Now, finally, set up Webscreen and start the fun...
+//              [secondWindow.rootViewController presentViewController:newwvc animated:YES completion:nil];
+//          }];
         }
     }
 }
