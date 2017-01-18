@@ -123,7 +123,7 @@
 
             if (secondWindow) {
                 // Attach session id to the selected screen
-                defaultwvc.sid = newSession.sid;
+                wvc.sid = newSession.sid;
 
                 WebscreenViewController * newwvc = [[WebscreenViewController alloc] initWithSid:newSession.sid];
                 newwvc.delegate = self;
