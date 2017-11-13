@@ -49,7 +49,7 @@
 
     // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPause) name:UIApplicationDidEnterBackgroundNotification object:nil];
     // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onResume) name:UIApplicationWillEnterForegroundNotification object:nil];
-     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onOrientationWillChange) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
+    // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onOrientationWillChange) name:UIApplicationWillChangeStatusBarOrientationNotification object:nil];
     // [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onOrientationDidChange) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 
     // Added in 2.3.0
@@ -67,6 +67,11 @@
     self.sessions = [[NSMutableDictionary alloc ] init];
     self.webscreens = [[NSMutableDictionary alloc ] init];
     self.screens = [[NSMutableArray alloc ] init];
+
+    AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession setCategory: AVAudioSessionCategorySoloAmbient withOptions: options error: nil];
+    [audioSession setActive: YES error: nil];
 }
 
 - (void) onOrientationWillChange
@@ -86,6 +91,7 @@
 - (void)requestSession:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"Called requestSession");
+
     // Create a new session immediately
     PresentationSession * newSession = [[PresentationSession alloc] initWithSid];
     newSession.delegate = self;
@@ -104,7 +110,7 @@
     [self returnInfo:command.callbackId andReturn:returnInfo andKeepCallback:true];
 
     // Display an alert msg to user if no external screen is available now
-    if (self.screensAvailable <= 0) {
+    if (self.screensAvailable == 0) {
         if( self.alert != nil) {
             [self.alert dismissWithClickedButtonIndex:0 animated:NO];
         }
@@ -134,6 +140,11 @@
             }
         }
     }
+
+    AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession setCategory: AVAudioSessionCategorySoloAmbient withOptions: options | AVAudioSessionCategoryOptionAllowAirPlay error: nil];
+    [audioSession setActive: YES error: nil];
 }
 
 - (void)returnInfo:(NSString*)callbackId andReturn:(NSMutableDictionary*)info andKeepCallback:(BOOL)keepCallback
@@ -242,7 +253,7 @@
     //UINavigationController *unc =[[UINavigationController alloc] init];
     //unc.navigationBar.hidden=YES;
     secondWindow.rootViewController = wvc;//unc;
-   // [secondWindow.rootViewController presentViewController:wvc animated:YES completion:nil];
+    // [secondWindow.rootViewController presentViewController:wvc animated:YES completion:nil];
 
     if(self.watchCallbackId != nil && self.screensAvailable > 0) {
         NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:1];
@@ -262,7 +273,7 @@
 - (void)handleScreenDidDisconnectNotification:(NSNotification*)aNotification
 {
     NSLog(@"Called handleScreenDidDisconnectNotification");
-    self.screensAvailable = (self.screensAvailable==0)?0:self.screensAvailable-1;
+    self.screensAvailable = (self.screensAvailable == 0) ? 0 : (self.screensAvailable - 1);
 
     // Update the picker and purge screen ref
     UIScreen *closingScreen = [aNotification object];
@@ -296,8 +307,10 @@
 
     // Store refs to screen and webscreen
     PresentationSession * ps = [self.sessions objectForKey:sid];
-    if (ps){
-        UIWindow *secondWindow=defaultwvc.window;
+
+    if (ps) {
+        UIWindow *secondWindow = defaultwvc.window;
+
         if (secondWindow) {
             // Attach session id to the selected screen
             defaultwvc.sid = sid;
@@ -324,14 +337,15 @@
     NSLog(@"Called webscreenReady");
     WebscreenViewController * wvc = [self.webscreens objectForKey:sid];
     PresentationSession * ps = [self.sessions objectForKey:sid];
-    if (wvc && ps){
+
+    if (wvc && ps) {
         // Webscreen is ready to load the url to be presented
         [wvc loadUrl:ps.url];
     } else {
         // Default display handling
         for (WebscreenViewController * defaultwvc in self.screens) {
             if ([defaultwvc.screenId isEqual:sid] ){
-                [defaultwvc loadUrl:[NSString stringWithFormat:@"%@#%@",self.defaultDisplayUrl,[defaultwvc.screenId substringFromIndex:31]]];
+                [defaultwvc loadUrl:[NSString stringWithFormat:@"%@#%@",self.defaultDisplayUrl, [defaultwvc.screenId substringFromIndex:31]]];
                 break;
             }
         }
@@ -395,7 +409,7 @@
 }
 
 - (void)setSecondScreen:(CDVInvokedUrlCommand*)command
-{    
+{
     NSString* cmd = [command.arguments objectAtIndex:0];    
 
     if ([cmd isEqualToString:@"deactivate"])
@@ -461,7 +475,7 @@
     PresentationSession * ps = [self.sessions objectForKey:sid];
 
     if(ps) {
-        if(![ps.state isEqual:@"disconnected"]){
+        if(![ps.state isEqual:@"disconnected"]) {
             [ps setState:@"disconnected"];
         }
 
@@ -484,6 +498,11 @@
         [wvc close];
         [self.webscreens removeObjectForKey:sid];
         // TODO(mla): check for better cleanup of the webscreen
+
+        AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory: AVAudioSessionCategorySoloAmbient withOptions: options error: nil];
+        [audioSession setActive: YES error: nil];
     }
 }
 
