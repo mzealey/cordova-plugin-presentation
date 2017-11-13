@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
+#import <AVFoundation/AVFoundation.h>
 #import <Cordova/CDV.h>
 #import "CDVPresentationPlugin.h"
 #import "DevicePickerViewController.h"
