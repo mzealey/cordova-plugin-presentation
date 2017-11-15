@@ -68,11 +68,6 @@
     self.sessions = [[NSMutableDictionary alloc ] init];
     self.webscreens = [[NSMutableDictionary alloc ] init];
     self.screens = [[NSMutableArray alloc ] init];
-
-    AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    [audioSession setCategory: AVAudioSessionCategoryPlayAndRecord withOptions: options error: nil];
-    [audioSession setActive: YES error: nil];
 }
 
 - (void) onOrientationWillChange
@@ -142,10 +137,7 @@
         }
     }
 
-    AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    [audioSession setCategory: AVAudioSessionCategoryPlayAndRecord withOptions: options | AVAudioSessionCategoryOptionAllowAirPlay error: nil];
-    [audioSession setActive: YES error: nil];
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:0 error:nil];
 }
 
 - (void)returnInfo:(NSString*)callbackId andReturn:(NSMutableDictionary*)info andKeepCallback:(BOOL)keepCallback
@@ -269,6 +261,8 @@
     UIScreen *newScreen = [aNotification object];
 
     [self addConnectedScreen:newScreen];
+    
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
 }
 
 - (void)handleScreenDidDisconnectNotification:(NSNotification*)aNotification
@@ -298,6 +292,8 @@
         [returnInfo setObject:[NSNumber numberWithBool:false] forKey:@"available"];
         [self returnInfo:self.watchCallbackId andReturn:returnInfo andKeepCallback:true];
     }
+
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:0 error:nil];
 }
 
 -(void)picker:(DevicePickerViewController *)controller didSelectScreen:(WebscreenViewController *)defaultwvc forSession:(NSString *)sid
@@ -500,10 +496,7 @@
         [self.webscreens removeObjectForKey:sid];
         // TODO(mla): check for better cleanup of the webscreen
 
-        AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
-        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        [audioSession setCategory: AVAudioSessionCategoryPlayAndRecord withOptions: options error: nil];
-        [audioSession setActive: YES error: nil];
+        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
     }
 }
 
