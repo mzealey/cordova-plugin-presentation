@@ -71,7 +71,7 @@
 
     AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    [audioSession setCategory: AVAudioSessionCategorySoloAmbient withOptions: options error: nil];
+    [audioSession setCategory: AVAudioSessionCategoryPlayAndRecord withOptions: options error: nil];
     [audioSession setActive: YES error: nil];
 }
 
@@ -144,7 +144,7 @@
 
     AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    [audioSession setCategory: AVAudioSessionCategorySoloAmbient withOptions: options | AVAudioSessionCategoryOptionAllowAirPlay error: nil];
+    [audioSession setCategory: AVAudioSessionCategoryPlayAndRecord withOptions: options | AVAudioSessionCategoryOptionAllowAirPlay error: nil];
     [audioSession setActive: YES error: nil];
 }
 
@@ -502,7 +502,7 @@
 
         AVAudioSessionCategoryOptions options = AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP;
         AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-        [audioSession setCategory: AVAudioSessionCategorySoloAmbient withOptions: options error: nil];
+        [audioSession setCategory: AVAudioSessionCategoryPlayAndRecord withOptions: options error: nil];
         [audioSession setActive: YES error: nil];
     }
 }
