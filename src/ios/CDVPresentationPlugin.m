@@ -68,6 +68,10 @@
     self.sessions = [[NSMutableDictionary alloc ] init];
     self.webscreens = [[NSMutableDictionary alloc ] init];
     self.screens = [[NSMutableArray alloc ] init];
+
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession setCategory: AVAudioSessionCategoryPlayAndRecord error: nil];
+    [audioSession setActive: YES error: nil];
 }
 
 - (void) onOrientationWillChange
@@ -137,7 +141,7 @@
         }
     }
 
-    //[[AVAudioSession sharedInstance] overrideOutputAudioPort:0 error:nil];
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:0 error:nil];
 }
 
 - (void)returnInfo:(NSString*)callbackId andReturn:(NSMutableDictionary*)info andKeepCallback:(BOOL)keepCallback
@@ -262,7 +266,7 @@
 
     [self addConnectedScreen:newScreen];
     
-    //[[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
 }
 
 - (void)handleScreenDidDisconnectNotification:(NSNotification*)aNotification
@@ -293,7 +297,7 @@
         [self returnInfo:self.watchCallbackId andReturn:returnInfo andKeepCallback:true];
     }
 
-    //[[AVAudioSession sharedInstance] overrideOutputAudioPort:0 error:nil];
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:0 error:nil];
 }
 
 -(void)picker:(DevicePickerViewController *)controller didSelectScreen:(WebscreenViewController *)defaultwvc forSession:(NSString *)sid
@@ -496,7 +500,7 @@
         [self.webscreens removeObjectForKey:sid];
         // TODO(mla): check for better cleanup of the webscreen
 
-        //[[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
     }
 }
 
