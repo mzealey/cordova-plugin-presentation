@@ -58,6 +58,7 @@
     self.webView = [[UIWebView alloc] initWithFrame:self.view.bounds];
     self.webView.delegate=self;
     self.webView.hidden=NO;
+    self.webView.mediaPlaybackAllowsAirPlay=NO;
     self.webView.autoresizesSubviews = YES;
     self.webView.backgroundColor = [UIColor clearColor];
     [self.webView setScalesPageToFit:YES];
