@@ -419,6 +419,8 @@
         {
             [wvc.window setHidden:YES];
         }
+
+        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
     }
     else if([cmd isEqualToString:@"activate"])
     {      
@@ -426,6 +428,8 @@
         {
             [wvc.window setHidden:NO];
         }
+
+        [[AVAudioSession sharedInstance] overrideOutputAudioPort:0 error:nil];
     }
     else
     {
