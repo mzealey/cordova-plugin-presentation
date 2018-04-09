@@ -1,0 +1,33 @@
+{
+  "name": "cordova-plugin-presentation",
+  "version": "0.7.2",
+  "description": "Create native multiscreen apps in minutes with the Cordova (W3C) Presentation API Plugin.",
+  "cordova": {
+    "id": "cordova-plugin-presentation",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThreeSixtyEu/cordova-plugin-presentation"
+  },
+  "keywords": [
+    "chromecaste",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    },
+    {
+      "name": "android-sdk",
+      "version": ">=16"
+    }
+  ],
+  "author": "ThreeSixtyEu",
+  "license": "Apache 2.0",
+  "homepage": "https://github.com/ThreeSixtyEu/cordova-plugin-presentation#readme"
+}
