@@ -8,10 +8,3 @@ html, body {
 body {
     background-color: #000000;
 }
-
-body.detached {
-    background-image: url("../img/shufflrr_splash_landscape.png");
-	background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-}
