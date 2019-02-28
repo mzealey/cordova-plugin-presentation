@@ -21,6 +21,7 @@ package de.fhg.fokus.famium.presentation;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -87,8 +88,10 @@ public class CDVPresentationPlugin extends CordovaPlugin implements DisplayManag
 		} else if (action.equals("presentationSessionClose")) {
 			LOG.d(LOG_TAG, "presentationSessionClose");
 			return presentationSessionClose(args,callbackContext);
-		}
-		else if (action.equals("setDefaultDisplay")) {
+		} else if (action.equals("setSecondScreen")) {
+			LOG.d(LOG_TAG, "setSecondScreen");
+			return setSecondScreen(args,callbackContext);
+		} else if (action.equals("setDefaultDisplay")) {
 			LOG.d(LOG_TAG, "setDefaultDisplay");
 			return setDefaultDisplay(args,callbackContext);
 		}
@@ -193,7 +196,35 @@ public class CDVPresentationPlugin extends CordovaPlugin implements DisplayManag
 		defaultDisplay = args.getString(0);
 		return true;
 	}
-	
+
+	private boolean setSecondScreen(JSONArray args, CallbackContext callbackContext) throws JSONException{
+		String cmd = args.get(0).toString();
+
+        LOG.d(LOG_TAG, "setSecondScreen: " + cmd);
+        if( cmd.equals("deactivate") ) {
+            Iterator<Integer> it = getPresentations().keySet().iterator();
+            while(it.hasNext()) {
+                Integer displayId = it.next();
+                LOG.d(LOG_TAG, "setSecondScreen: " + displayId);
+                removeDisplay(displayId);
+                it.remove();
+            }
+        }
+        else if( cmd.equals("activate") ) {
+			/*getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {*/
+                    for (Display display : displayManager.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION)) {
+                        addDisplay(display);
+                    }
+                    /*
+                }
+            });*/
+        }
+
+		return true;
+	}
+
 	/**
 	 * 
 	 * @return the url of the default display
@@ -314,15 +345,19 @@ public class CDVPresentationPlugin extends CordovaPlugin implements DisplayManag
 		removeDisplay(displayId);
 	}
 	
+	private void createPresentation(final Display display) {
+        SecondScreenPresentation presentation = new SecondScreenPresentation(getActivity(),display,getDefaultDisplay());
+        getPresentations().put(display.getDisplayId(), presentation);
+        presentation.show();
+    }
+
 	private void addDisplay(final Display display) {
 		if ((display.getFlags() & Display.FLAG_PRESENTATION) != 0) {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					int oldSize = getSessions().size();
-					SecondScreenPresentation presentation = new SecondScreenPresentation(getActivity(),display,getDefaultDisplay());
-					getPresentations().put(display.getDisplayId(), presentation);
-					presentation.show();
+                    createPresentation(display);
 					int newSize = getPresentations().size();
 					CallbackContext callbackContext = getAvailableChangeCallbackContext();
 					if (oldSize == 0 && newSize == 1 && callbackContext != null) {
@@ -333,16 +368,22 @@ public class CDVPresentationPlugin extends CordovaPlugin implements DisplayManag
 		}
 	}
 	
-	private void removeDisplay(int displayId) {
-		int oldSize = getPresentations().size();
-		final SecondScreenPresentation presentation = getPresentations().remove(displayId);
+	private void removePresentation(int displayId) {
+		final SecondScreenPresentation presentation = getPresentations().get(displayId);
 		if (presentation != null) {
+            presentation.cancel();
 			PresentationSession session = presentation.getSession();
 			if (session != null) {
 				session.setPresentation(null);
 				getSessions().remove(session.getId());
 			}
 		}
+    }
+
+	private void removeDisplay(int displayId) {
+		int oldSize = getPresentations().size();
+        removePresentation(displayId);
+		getPresentations().remove(displayId);
 		int newSize = getPresentations().size();
 		CallbackContext callbackContext = getAvailableChangeCallbackContext();
 		if (oldSize > 0 && newSize == 0 && callbackContext != null) {
