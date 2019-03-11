@@ -153,7 +153,8 @@ public class PresentationSession {
                         // double-escape of double-escap ie 4 \s for 1 \
                         // character replacement... ugh!
                         String escaped = msg.replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
-						getPresentation().getWebView().loadUrl("javascript:NavigatorPresentationJavascriptInterface.onmessage('"+getId()+"','"+escaped+"')");
+                        if (getPresentation() != null)
+                            getPresentation().getWebView().loadUrl("javascript:NavigatorPresentationJavascriptInterface.onmessage('"+getId()+"','"+escaped+"')");
 					}
 				});
 			}

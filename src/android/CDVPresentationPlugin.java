@@ -301,7 +301,8 @@ public class CDVPresentationPlugin extends CordovaPlugin implements DisplayManag
 	@Override
 	public void onDisplayAdded(int displayId) {
 		Display display = getDisplayManager().getDisplay(displayId);
-		addDisplay(display);
+        if(display != null)
+            addDisplay(display);
 	}
 	
 	@Override
