@@ -22,14 +22,13 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="de.fhg.fokus.famium.presentation"
+    id="cordova-plugin-presentation"
     version="0.7.3">
     <name>Presentation</name>
     <description>Cordova Presentation API Plugin</description>
     <license>Apache 2.0</license>
     <keywords>famium,cordova,presentation,presentation api,second screen,multi-screen,webscreens</keywords>
-    <repo>https://github.com/fraunhoferfokus/cordova-plugin-presentation.git</repo>
-    <issue>https://github.com/fraunhoferfokus/cordova-plugin-presentation/issues</issue>
+    <repo>https://github.com/mzealey/cordova-plugin-presentation.git</repo>
 
     <js-module src="www/presentation.js" name="presentation">
         <clobbers target="navigator.presentation" />
