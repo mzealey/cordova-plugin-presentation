@@ -147,12 +147,12 @@ public class PresentationSession {
 				getActivity().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-                        // Escape \ and " characters in the string we are
+                        // Escape \ and ' characters in the string we are
                         // passing through to js... Note that a \\ replacement
                         // would be interpreted as a backref so we need to use
                         // double-escape of double-escap ie 4 \s for 1 \
                         // character replacement... ugh!
-                        String escaped = msg.replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
+                        String escaped = msg.replaceAll("\\\\","\\\\\\\\").replaceAll("\'", "\\\\\'");
                         if (getPresentation() != null)
                             getPresentation().getWebView().loadUrl("javascript:NavigatorPresentationJavascriptInterface.onmessage('"+getId()+"','"+escaped+"')");
 					}
